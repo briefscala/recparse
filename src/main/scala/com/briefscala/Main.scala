@@ -64,7 +64,7 @@ object Main {
             case scalaz.Failure(nel) =>
               log.error(s"Some arguments could not be parsed: $nel")
             case scalaz.Success((filePath, sep, len, isNew)) =>
-              println(s"$filePath\n$sep\n$len\n$isNew")
+              println(s"filePath = $filePath\nsep = $sep\nlen = $len\nisNew = $isNew")
           }
     }
   }
