@@ -16,10 +16,16 @@ object Main {
     val config = ConfigFactory.load()
     val separator = config.getString("rec-parse.separator")
 
+    /**
+     * add support for "-flag=argument" format
+     */
     val args0 = args.flatMap(_.split("="))
 
     val args1 = args0.toSeq
 
+    /**
+     * try to parse in the records from the provided arguments
+     */
     val maybeFilePath = args1.getRecord[FilePath]
     val maybeSource = args1.getRecord[IsNew]
     val maybeLang = args1.getRecord[Len]
@@ -31,6 +37,9 @@ object Main {
     val failedLength = "No lenth specified or was invalid".failureNel[Len]
     val failedIsNew = "No --is-new flag specified or was invalid".failureNel[IsNew]
 
+    /**
+     * put all the records together or fail
+     */
     val argsValidation = (
       maybeFilePath.fold(failedFilePath)(_.successNel) |@|
       maybeSeparator.fold(failedSeparator)(_.successNel) |@|
@@ -42,6 +51,9 @@ object Main {
       case scalaz.Failure(nel) =>
         log.error(s"Invalid or missing arguments: $nel")
       case scalaz.Success(validArgs) =>
+      /**
+       * if all went well 'validArgs' is the record with the arguments
+       */
         val parsedArgs = (
             selectArg(validArgs, filePathWitness) |@|
             selectArg(validArgs, separatorWitness) |@|
@@ -56,6 +68,9 @@ object Main {
           }
     }
   }
+  /**
+   * extract the value from a record given its singleton(Witness) key
+   */
   def selectArg[L <: HList](xs: L, argWitness: Witness.Lt[String])(implicit
    sel: Selector[L, argWitness.T]) = xs(argWitness)
 }
