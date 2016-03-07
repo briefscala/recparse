@@ -10,7 +10,6 @@ trait RecFromArgs[R <: HList] extends Serializable {
 }
 
 object RecFromArgs {
-  def apply[R <: HList](implicit fa: RecFromArgs[R]) = fa
 
   implicit def hnilFromArgs[T]: RecFromArgs[HNil] =
     new RecFromArgs[HNil] {
