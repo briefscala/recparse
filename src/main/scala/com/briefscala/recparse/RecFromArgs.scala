@@ -42,6 +42,13 @@ trait ~>[A, B] extends Serializable {
 object ~> {
   implicit val stringParser = parseString(identity)
   implicit val charParser = parseString(_.head)
+  implicit val byteParser = parseString(_.toByte)
+  implicit val shortParser = parseString(_.toShort)
+  implicit val intParser = parseString(_.toInt)
+  implicit val longParser = parseString(_.toLong)
+  implicit val floatParser = parseString(_.toFloat)
+  implicit val doubleParser = parseString(_.toDouble)
+  implicit val booleanParser = parseString(_.toBoolean)
   def parseString[B](fp: Parser[B]): String ~> B =
     new (String ~> B) {
       def parse(s: String): ValidationNel[Throwable, B] =
