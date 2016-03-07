@@ -32,10 +32,10 @@ object Main {
     val maybeSeparator = args1.getRecord[Separator]
       .orElse(Seq("-sep", separator).getRecord[Separator])
 
-    val failedFilePath = "No file path was specified or was invalid".failureNel[FilePath]
+    val failedFilePath = "No file path was specified".failureNel[FilePath]
     val failedSeparator = "An invalid separator was specified".failureNel[Separator]
-    val failedLength = "No lenth specified or was invalid".failureNel[Len]
-    val failedIsNew = "No --is-new flag specified or was invalid".failureNel[IsNew]
+    val failedLength = "No lenth specified".failureNel[Len]
+    val failedIsNew = "No --is-new flag specified".failureNel[IsNew]
 
     /**
      * put all the records together or fail
@@ -49,7 +49,7 @@ object Main {
 
     argsValidation match {
       case scalaz.Failure(nel) =>
-        log.error(s"Invalid or missing arguments: $nel")
+        log.error(s"missing required arguments: $nel")
       case scalaz.Success(validArgs) =>
       /**
        * if all went well 'validArgs' is the record with the arguments
@@ -62,7 +62,7 @@ object Main {
           ).tupled
           parsedArgs match {
             case scalaz.Failure(nel) =>
-              log.error(s"Some arguments could not be parsed: $nel")
+              log.error(s"Could not parse all required arguments: $nel")
             case scalaz.Success((filePath, sep, len, isNew)) =>
               println(s"filePath = $filePath\nsep = $sep\nlen = $len\nisNew = $isNew")
           }
