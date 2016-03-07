@@ -16,11 +16,11 @@ object RecFromArgs {
       def apply(n: Seq[String]): Option[HNil] = Some(HNil)
     }
 
-  implicit def hlistFromArgs[S, V, T <: HList]
-  (implicit wk: Witness.Aux[S], parser: String ~> V, fa: RecFromArgs[T])
-  : RecFromArgs[ValidFieldType[S, V] :: T] =
-    new RecFromArgs[ValidFieldType[S, V] :: T] {
-      def apply(args: Seq[String]): Option[ValidFieldType[S, V] :: T] =
+  implicit def hlistFromArgs[S, V, R <: HList]
+  (implicit wk: Witness.Aux[S], parser: String ~> V, fa: RecFromArgs[R])
+  : RecFromArgs[ValidFieldType[S, V] :: R] =
+    new RecFromArgs[ValidFieldType[S, V] :: R] {
+      def apply(args: Seq[String]): Option[ValidFieldType[S, V] :: R] =
         args match {
           case flag +: arg +: tail =>
             val typed = parser.parse(arg)

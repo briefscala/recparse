@@ -19,54 +19,54 @@ object Main {
     /**
      * add support for "-flag=argument" format
      */
-    val args0 = args.flatMap(_.split("="))
+     val args0 = args.flatMap(_.split("="))
 
-    val args1 = args0.toSeq
+     val args1 = args0.toSeq
 
-    /**
-     * try to parse in the records from the provided arguments
-     */
-    val maybeFilePath = args1.getRecord[FilePath]
-    val maybeSource = args1.getRecord[IsNew]
-    val maybeLang = args1.getRecord[Len]
-    val maybeSeparator = args1.getRecord[Separator]
-      .orElse(Seq("-sep", separator).getRecord[Separator])
+     /**
+      * try to parse in the records from the provided arguments
+      */
+     val maybeFilePath = args1.getRecord[FilePath]
+     val maybeInNew = args1.getRecord[IsNew]
+     val maybeLen = args1.getRecord[Len]
+     val maybeSeparator = args1.getRecord[Separator]
+       .orElse(Seq("-sep", separator).getRecord[Separator])
 
-    val failedFilePath = "No file path was specified".failureNel[FilePath]
-    val failedSeparator = "An invalid separator was specified".failureNel[Separator]
-    val failedLength = "No lenth specified".failureNel[Len]
-    val failedIsNew = "No --is-new flag specified".failureNel[IsNew]
+     val failedFilePath = "No file path was specified".failureNel[FilePath]
+     val failedSeparator = "An invalid separator was specified".failureNel[Separator]
+     val failedLen = "No lenth specified".failureNel[Len]
+     val failedIsNew = "No --is-new flag specified".failureNel[IsNew]
 
-    /**
-     * put all the records together or fail
-     */
-    val argsValidation = (
-      maybeFilePath.fold(failedFilePath)(_.successNel) |@|
-      maybeSeparator.fold(failedSeparator)(_.successNel) |@|
-      maybeLang.fold(failedLength)(_.successNel) |@|
-      maybeSource.fold(failedIsNew)(_.successNel)
-    ){_++_++_++_}
+     /**
+      * put all the records together or fail
+      */
+     val argsValidation = (
+       maybeFilePath.fold(failedFilePath)(_.successNel) |@|
+       maybeSeparator.fold(failedSeparator)(_.successNel) |@|
+       maybeLen.fold(failedLen)(_.successNel) |@|
+       maybeInNew.fold(failedIsNew)(_.successNel)
+     ){_++_++_++_}
 
-    argsValidation match {
-      case scalaz.Failure(nel) =>
-        log.error(s"missing required arguments: $nel")
-      case scalaz.Success(validArgs) =>
-      /**
-       * if all went well 'validArgs' is the record with the arguments
-       */
-        val parsedArgs = (
-            selectArg(validArgs, filePathWitness) |@|
-            selectArg(validArgs, separatorWitness) |@|
-            selectArg(validArgs, lenWitness) |@|
-            selectArg(validArgs, isnewWitness)
-          ).tupled
-          parsedArgs match {
-            case scalaz.Failure(nel) =>
-              log.error(s"Could not parse all required arguments: $nel")
-            case scalaz.Success((filePath, sep, len, isNew)) =>
-              println(s"filePath = $filePath\nsep = $sep\nlen = $len\nisNew = $isNew")
-          }
-    }
+     argsValidation match {
+       case scalaz.Failure(nel) =>
+         log.error(s"missing required arguments: $nel")
+       case scalaz.Success(validArgs) =>
+       /**
+        * if all went well 'validArgs' is the record with the arguments
+        */
+         val parsedArgs = (
+             selectArg(validArgs, filePathWitness) |@|
+             selectArg(validArgs, separatorWitness) |@|
+             selectArg(validArgs, lenWitness) |@|
+             selectArg(validArgs, isnewWitness)
+           ).tupled
+           parsedArgs match {
+             case scalaz.Failure(nel) =>
+               log.error(s"could not parse all required arguments: $nel")
+             case scalaz.Success((filePath, sep, len, isNew)) =>
+               println(s"filePath = $filePath\nsep = $sep\nlen = $len\nisNew = $isNew")
+           }
+     }
   }
   /**
    * extract the value from a record given its singleton(Witness) key
