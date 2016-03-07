@@ -1,4 +1,4 @@
-## Rec Parse - parse application arguments with shapeless and scalaz
+## Rec Parse - parse arguments with shapeless
 
 Rec Parse leverage shapeless extensible records and scalaz `ValidationNel` to parse and validate application arguments.
 
