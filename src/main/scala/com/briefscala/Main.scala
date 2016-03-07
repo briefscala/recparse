@@ -1,11 +1,17 @@
 package com.briefscala
 
 import com.typesafe.config.ConfigFactory
+import org.slf4j.{Logger, LoggerFactory}
 import com.briefscala.recparse._
+import shapeless._, record._, ops.record.Selector
 import scalaz._, Scalaz._
 
 object Main {
   def main(args: Array[String]): Unit = {
+
+    val log = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME)
+    log.asInstanceOf[ch.qos.logback.classic.Logger]
+      .setLevel(ch.qos.logback.classic.Level.INFO)
 
     val config = ConfigFactory.load()
     val separator = config.getString("rec-parse.separator")
@@ -32,6 +38,24 @@ object Main {
       maybeSource.fold(failedIsNew)(_.successNel)
     ){_++_++_++_}
 
-    println(argsValidation)
+    argsValidation match {
+      case scalaz.Failure(nel) =>
+        log.error(s"Invalid or missing arguments: $nel")
+      case scalaz.Success(validArgs) =>
+        val parsedArgs = (
+            selectArg(validArgs, filePathWitness) |@|
+            selectArg(validArgs, separatorWitness) |@|
+            selectArg(validArgs, langWitness) |@|
+            selectArg(validArgs, sourceWitness)
+          ).tupled
+          parsedArgs match {
+            case scalaz.Failure(nel) =>
+              log.error(s"Some arguments could not be parsed: $nel")
+            case scalaz.Success((filePath, sep, len, isNew)) =>
+              println(s"$filePath\n$sep\n$len\n$isNew")
+          }
+    }
   }
+  def selectArg[L <: HList](xs: L, argWitness: Witness.Lt[String])(implicit
+   sel: Selector[L, argWitness.T]) = xs(argWitness)
 }
