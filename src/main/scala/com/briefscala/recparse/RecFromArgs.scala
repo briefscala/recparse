@@ -10,7 +10,7 @@ trait RecFromArgs[R <: HList] extends Serializable {
 }
 
 object RecFromArgs {
-  def apply[R <: HList](implicit fxml: RecFromArgs[R]) = fxml
+  def apply[R <: HList](implicit fa: RecFromArgs[R]) = fa
 
   implicit def hnilFromArgs[T]: RecFromArgs[HNil] =
     new RecFromArgs[HNil] {
@@ -18,7 +18,7 @@ object RecFromArgs {
     }
 
   implicit def hlistFromArgs[S, V, T <: HList]
-  (implicit wk: Witness.Aux[S], parser: String ~> V, fargs: RecFromArgs[T])
+  (implicit wk: Witness.Aux[S], parser: String ~> V, fa: RecFromArgs[T])
   : RecFromArgs[ValidFieldType[S, V] :: T] =
     new RecFromArgs[ValidFieldType[S, V] :: T] {
       def apply(args: Seq[String]): Option[ValidFieldType[S, V] :: T] =
@@ -27,7 +27,7 @@ object RecFromArgs {
             val typed = parser.parse(arg)
             val maybeRecord = for {
               _ <- (flag == wk.value).option(true)
-              rest <- fargs(tail)
+              rest <- fa(tail)
             } yield field[S](typed) :: rest
             maybeRecord.orElse(apply(arg +: tail))
           case _ => None

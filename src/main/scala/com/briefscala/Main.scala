@@ -45,8 +45,8 @@ object Main {
         val parsedArgs = (
             selectArg(validArgs, filePathWitness) |@|
             selectArg(validArgs, separatorWitness) |@|
-            selectArg(validArgs, langWitness) |@|
-            selectArg(validArgs, sourceWitness)
+            selectArg(validArgs, lenWitness) |@|
+            selectArg(validArgs, isnewWitness)
           ).tupled
           parsedArgs match {
             case scalaz.Failure(nel) =>
