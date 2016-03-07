@@ -2,7 +2,6 @@ package com.briefscala
 
 import shapeless._, labelled._
 import scalaz.ValidationNel
-import scala.language.implicitConversions
 
 package object recparse {
   type Parser[B] = (String) => B
