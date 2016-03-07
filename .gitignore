@@ -1,0 +1,6 @@
+.classpath
+.settings
+.ensime*
+.idea/
+project/project
+target/
